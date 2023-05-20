@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  python3.9
+
+  Sample SAM Template for appeal-ai
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: The environment for this deployment (dev or prod).
+  JobTimeout:
+    Type: Number
+    Default: 180
+    Description: The maximum amount of time (in seconds) for the job to run.
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+
+Resources:
+  ProfileApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowOrigin: "'*'"
+        AllowMethods: "'OPTIONS,POST,HEAD'"
+        AllowHeaders: "'*'"
+  ProfileFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+      AutoPublishAlias: !Ref Stage
+      Events:
+        ProfileApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ProfileApi
+            Path: /app
+            Method: post
+      Role: arn:aws:iam::960400260221:role/AppLambdaExecutionRole
+      FunctionName: !Sub "profile-func-${Stage}"
+      Environment:
+        Variables:
+          PROFILE_JOB_FUNCTION_ARN: !GetAtt ProfileJobFunction.Arn
+          STAGE: !Ref Stage
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./app
+      DockerTag: python3.9-v1
+  ProfileJobFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+      AutoPublishAlias: !Ref Stage
+      Role: arn:aws:iam::960400260221:role/AppLambdaExecutionRole
+      Timeout: !Ref JobTimeout
+      FunctionName: !Sub "profile-job-func-${Stage}"
+      Environment:
+        Variables:
+          PROFILE_TEXT_FUNCTION_ARN: !GetAtt ProfileTextFunction.Arn
+          PROFILE_IMG_FUNCTION_ARN: !GetAtt ProfileImgFunction.Arn
+          STAGE: !Ref Stage
+    Metadata:
+      DockerBuildTarget: prod
+      Dockerfile: Dockerfile
+      DockerContext: ./job_app
+      DockerTag: python3.9-v1
+  ProfileTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+      AutoPublishAlias: !Ref Stage
+      Role: arn:aws:iam::960400260221:role/AppLambdaExecutionRole
+      FunctionName: !Sub "profile-text-func-${Stage}"
+      Timeout: !Ref JobTimeout
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./text_app
+      DockerTag: python3.9-v1
+  ProfileImgFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+      AutoPublishAlias: !Ref Stage
+      Role: arn:aws:iam::960400260221:role/AppLambdaExecutionRole
+      FunctionName: !Sub "profile-img-func-${Stage}"
+      Timeout: !Ref JobTimeout
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./img_app
+      DockerTag: python3.9-v1
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ProfileApi:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ProfileApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/app/"

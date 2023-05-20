@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  # text-app:
+  #   build:
+  #     context: ./text_app
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - 8080:8080
+  #   tty: true
+  #   stdin_open: true
+  #   command: >
+  #     /bin/sh
+  #   volumes:
+  #     - $PWD/text_app/app.py:/var/task/app.py
+  #     - $PWD/text_app/app_utils/:/var/task/app_utils
+  #     - $PWD/text_app/requirements.txt:/var/task/requirements.txt
+  #     - $PWD/text_app/.vscode:/var/task/.vscode
+  #   env_file:
+  #     - .env
+  # img-app:
+  #   build:
+  #     context: ./img_app
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - 8080:8080
+  #   tty: true
+  #   stdin_open: true
+  #   command: >
+  #     /bin/sh
+  #   volumes:
+  #     - $PWD/img_app/app.py:/var/task/app.py
+  #     - $PWD/img_app/app_utils/:/var/task/app_utils
+  #     - $PWD/img_app/requirements.txt:/var/task/requirements.txt
+  #     - $PWD/img_app/.vscode:/var/task/.vscode
+  #   env_file:
+  #     - .env
+  job-app:
+    build:
+      context: ./job_app
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - 8080:8080
+    tty: true
+    stdin_open: true
+    command: >
+      /bin/sh
+    volumes:
+      - $PWD/job_app/app.py:/var/task/app.py
+      - $PWD/job_app/app_utils/:/var/task/app_utils
+      - $PWD/job_app/requirements.txt:/var/task/requirements.txt
+      - $PWD/job_app/.vscode:/var/task/.vscode
+    env_file:
+      - .env
+  # app:
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - 8080:8080
+  #   tty: true
+  #   stdin_open: true
+  #   command: >
+  #     /bin/sh
+  #   volumes:
+  #     - $PWD/app/app.py:/var/task/app.py
+  #     - $PWD/app/app_utils/:/var/task/app_utils
+  #     - $PWD/app/requirements.txt:/var/task/requirements.txt
+  #     - $PWD/app/.vscode:/var/task/.vscode
+  #   env_file:
+  #     - .env

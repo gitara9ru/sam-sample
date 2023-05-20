@@ -1,0 +1,7 @@
+requests
+python-json-logger
+openai
+langchain
+stability-sdk
+boto3
+aws-lambda-powertools

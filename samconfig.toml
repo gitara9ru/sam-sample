@@ -1,0 +1,13 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "appeal-ai"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1b7ptfwrf83y5"
+s3_prefix = "appeal-ai"
+region = "ap-northeast-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "Stage=\"dev\" JobTimeout=\"180\""
+image_repositories = ["ProfileFunction=960400260221.dkr.ecr.ap-northeast-1.amazonaws.com/appealai2dc596d0/profilefunction8c66993crepo", "ProfileJobFunction=960400260221.dkr.ecr.ap-northeast-1.amazonaws.com/appealai2dc596d0/profilejobfunction8ae7326drepo", "ProfileTextFunction=960400260221.dkr.ecr.ap-northeast-1.amazonaws.com/appealai2dc596d0/profiletextfunction86876143repo", "ProfileImgFunction=960400260221.dkr.ecr.ap-northeast-1.amazonaws.com/appealai2dc596d0/profileimgfunctiond48991cdrepo"]
